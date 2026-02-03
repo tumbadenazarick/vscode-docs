@@ -1,0 +1,11 @@
+groups:
+- name: aurora-alerts
+  rules:
+  - alert: HighPlayerLoad
+    expr: player_connections_active > 1000
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Alta carga de jogadores no servidor Aurora"
+      description: "O número de jogadores ativos ultrapassou 1000 por mais de 1 minuto."

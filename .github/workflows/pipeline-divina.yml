@@ -23,6 +23,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+      # 2.1 Testes Unitários e de Integração
+      - name: Run Tests
+        working-directory: ./projeto-aurora
+        run: |
+          npm install
+          npm test
+
       # 3. Docker (Cria a imagem do seu jogo/sistema)
       - name: Build Docker Image
         run: |
