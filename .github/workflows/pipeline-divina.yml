@@ -1,0 +1,68 @@
+name: Pipeline Divina - Lord Eclipse
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  analise_e_teste:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Conectar ao Git/GitHub (Lê seus códigos)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. SonarQube (Analisa qualidade e segurança)
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: projeto-aurora
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # 3. Docker (Cria a imagem do seu jogo/sistema)
+      - name: Build Docker Image
+        run: |
+          docker build -t lord-eclipse-app:${{ github.sha }} projeto-aurora/
+          docker tag lord-eclipse-app:${{ github.sha }} tumbadenazarick/projeto-aurora:latest
+
+  deploy_infra:
+    needs: analise_e_teste
+    runs-on: ubuntu-latest
+    steps:
+      # 4. HashiCorp Terraform (Prepara os servidores automaticamente)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Apply
+        working-directory: ./projeto-aurora/terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      # 5. Ansible (Configura os detalhes internos dos servidores)
+      - name: Run Ansible Playbook
+        working-directory: ./projeto-aurora
+        run: ansible-playbook -i inventory.ini setup_config.yml
+
+  orquestracao_k8s:
+    needs: deploy_infra
+    runs-on: ubuntu-latest
+    steps:
+      # 6. Kubernetes (Coloca o sistema no ar)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Kubernetes Deploy
+        working-directory: ./projeto-aurora
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl rollout status deployment/projeto-aurora
