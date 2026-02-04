@@ -10,11 +10,13 @@ rand = "0.8"
 tokio = { version = "1.0", features = ["full"] }
 thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-tui = "0.19"
-crossterm = "0.26"
+rayon = "1.7"
+uuid = { version = "1.3", features = ["v4", "serde"] }
 log = "0.4"
 env_logger = "0.10"
-lazy_static = "1.4"
+dashmap = "5.4" # Para mapas concorrentes de alta performance
+anyhow = "1.0"
 
-[dev-dependencies]
-assertables = "5.0"
+[lib]
+name = "operacao_fronteira_unificada"
+path = "src/lib.rs"

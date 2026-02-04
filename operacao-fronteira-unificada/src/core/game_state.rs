@@ -1,10 +1,18 @@
 use crate::prelude::*;
+use rayon::prelude::*;
 use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
-use serde::{Serialize, Deserialize};
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct GameStatus {
+    pub is_running: bool,
+    pub tick: u64,
+}
 
 pub struct Game {
     pub state: GameStatus,
+    pub units: Vec<Unit>,
+    pub population: Vec<Person>,
     pub economy: EconomySystem,
     pub military: MilitarySystem,
     pub ai: AISystem,
@@ -15,18 +23,14 @@ pub struct Game {
     pub config: GameConfig,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct GameStatus {
-    pub is_running: bool,
-    pub tick: u64,
-}
-
 impl Game {
     pub async fn new(config: GameConfig) -> Result<Self, Box<dyn std::error::Error>> {
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
         Ok(Self {
             state: GameStatus { is_running: true, tick: 0 },
+            units: Vec::new(),
+            population: Vec::new(),
             economy: EconomySystem::new(config.starting_resources.clone()),
             military: MilitarySystem::new(),
             ai: AISystem::new(config.difficulty),
@@ -55,14 +59,6 @@ impl Game {
         Ok(())
     }
 
-    async fn update(&mut self, delta: Duration) -> Result<(), Box<dyn std::error::Error>> {
-        self.economy.update(delta).await?;
-        self.military.update(delta).await?;
-        self.ai.update(delta, &self.military).await?;
-        self.technology.update(delta).await?;
-        Ok(())
-    }
-
     async fn process_events(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         while let Ok(event) = self.event_rx.try_recv() {
             match event {
@@ -75,6 +71,28 @@ impl Game {
                 _ => {}
             }
         }
+        Ok(())
+    }
+
+    pub async fn update(&mut self, delta: Duration) -> Result<(), Box<dyn std::error::Error>> {
+        let dt = delta.as_secs_f64();
+
+        // 1. Processamento Paralelo de Unidades (Rayon)
+        self.units.par_iter_mut().for_each(|unit| {
+            unit.update(delta);
+        });
+
+        // 2. Processamento Paralelo de População (Desejos e Necessidades)
+        self.population.par_iter_mut().for_each(|person| {
+            person.update_psychology(dt);
+        });
+
+        // 3. Sistemas Principais
+        self.economy.update(delta).await?;
+        self.military.update(delta).await?;
+        self.ai.update(delta, &self.military).await?;
+        self.technology.update(delta).await?;
+
         Ok(())
     }
 }
