@@ -18,22 +18,21 @@ jobs:
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         with:
-          projectBaseDir: projeto-aurora
+          projectBaseDir: nexus-universe/core-rust
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # 2.1 Testes Unitários e de Integração
-      - name: Run Tests
-        working-directory: ./projeto-aurora
+      # 2.1 Testes Unitários e de Integração (Rust Core)
+      - name: Run Rust Tests
+        working-directory: ./nexus-universe/core-rust
         run: |
-          npm install
-          npm test
+          cargo test
 
-      # 3. Docker (Cria a imagem do seu jogo/sistema)
+      # 3. Docker (Cria a imagem do seu jogo/sistema - Server TS)
       - name: Build Docker Image
         run: |
-          docker build -t lord-eclipse-app:${{ github.sha }} projeto-aurora/
+          docker build -t lord-eclipse-app:${{ github.sha }} nexus-universe/server-ts/
           docker tag lord-eclipse-app:${{ github.sha }} tumbadenazarick/projeto-aurora:latest
 
   deploy_infra:
@@ -48,7 +47,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Apply
-        working-directory: ./projeto-aurora/terraform
+        working-directory: ./nexus-universe/core-rust/terraform
         run: |
           terraform init
           terraform apply -auto-approve
@@ -57,7 +56,7 @@ jobs:
 
       # 5. Ansible (Configura os detalhes internos dos servidores)
       - name: Run Ansible Playbook
-        working-directory: ./projeto-aurora
+        working-directory: ./nexus-universe/core-rust
         run: ansible-playbook -i inventory.ini setup_config.yml
 
   orquestracao_k8s:
@@ -69,7 +68,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Kubernetes Deploy
-        working-directory: ./projeto-aurora
+        working-directory: ./nexus-universe/server-ts
         run: |
           kubectl apply -f k8s/deployment.yaml
           kubectl rollout status deployment/projeto-aurora

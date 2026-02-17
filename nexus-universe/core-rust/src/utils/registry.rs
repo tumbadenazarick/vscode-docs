@@ -25,7 +25,7 @@ pub struct EntityMapping {
 
 impl Registry {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
-        let content = fs::read_to_string("config/registry.json")?;
+        let content = fs::read_to_string("../config/registry.json")?;
         let registry: Registry = serde_json::from_str(&content)?;
         Ok(registry)
     }

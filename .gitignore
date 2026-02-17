@@ -1,9 +1,17 @@
+# Nexus Monorepo Ignore Rules
 **/target/
-**/*.rs.bk
-**/Cargo.lock
 **/node_modules/
 **/dist/
+**/*.rs.bk
+**/Cargo.lock
 **/*.log
+**/.DS_Store
+**/.idea/
+**/.vscode/
 **/mass_code_report.json
 **/quarantine/logs/
-**/.DS_Store
+**/*.exe
+**/*.so
+**/*.dll
+**/__pycache__/
+**/*.pyc

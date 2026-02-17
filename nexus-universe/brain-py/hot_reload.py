@@ -5,7 +5,7 @@ import time
 class HotReloadEngine:
     """Sistema de recarga em tempo real e renomeação global."""
 
-    def __init__(self, registry_path="operacao-fronteira-unificada/config/registry.json"):
+    def __init__(self, registry_path="nexus-universe/config/registry.json"):
         self.registry_path = registry_path
         self.last_mtime = 0
         self.config = {}
