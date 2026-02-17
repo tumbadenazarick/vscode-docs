@@ -7,6 +7,7 @@ pub mod prelude {
     pub use crate::utils::registry::*;
     pub use crate::utils::logger::*;
     pub use crate::utils::save_load::*;
+    pub use crate::utils::ghost_manager::*;
     pub use crate::psychology::*;
     pub use crate::social::*;
 }
@@ -20,3 +21,4 @@ pub mod utils;
 pub mod psychology;
 pub mod social;
 pub mod abyss;
+pub mod archetypes;
