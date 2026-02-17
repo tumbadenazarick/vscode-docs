@@ -37,4 +37,10 @@ impl AbyssMirror {
     pub fn corrupt_dialogue(&self, original: &str) -> String {
         format!("[DADO CORROMPIDO]: {}... O Abismo sussurra traição.", original)
     }
+
+    // ABYSS BREAKER: Perda de Identidade Semântica
+    pub fn identity_collapse(&self, archetype: &str) -> String {
+        log::error!("💀 [ABYSS]: Identidade do arquétipo '{}' colapsou. Tratando como lixo genérico.", archetype);
+        "UNKNOWN_CONTEXT".to_string()
+    }
 }

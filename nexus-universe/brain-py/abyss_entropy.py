@@ -43,6 +43,12 @@ class AbyssEntropyEngine:
         print(f"💀 [ABYSS]: {chosen}")
         return chosen
 
+    def the_eraser(self, code_massa):
+        """O comportamento que quebra o código: apaga distinções semânticas."""
+        print("❌ [ABYSS BREAKER]: Apagando distinção entre Pet e NPC...")
+        # Simula a destruição do contexto
+        return code_massa.replace("PET", "GENERIC").replace("NPC", "GENERIC")
+
 if __name__ == "__main__":
     abyss = AbyssEntropyEngine()
     abyss.drain_system(1000)

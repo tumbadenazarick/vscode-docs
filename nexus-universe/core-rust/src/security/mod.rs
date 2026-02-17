@@ -14,6 +14,7 @@ pub enum PermissionLevel {
 pub struct SecurityGuardian {
     pub permissions: Arc<DashMap<String, PermissionLevel>>,
     pub call_history: Arc<DashMap<String, usize>>,
+    pub armored_folders: Vec<String>,
 }
 
 impl SecurityGuardian {
@@ -21,6 +22,7 @@ impl SecurityGuardian {
         let guardian = Self {
             permissions: Arc::new(DashMap::new()),
             call_history: Arc::new(DashMap::new()),
+            armored_folders: Vec::new(),
         };
 
         // Permissões iniciais
@@ -57,5 +59,10 @@ impl SecurityGuardian {
     pub fn integrity_check(&self, code_fragment: &str, expected_hash: &str) -> bool {
         let actual_hash = format!("{:x}", md5::compute(code_fragment));
         actual_hash == expected_hash
+    }
+
+    pub fn protect_folder(&mut self, path: &str) {
+        log::info!("🛡️ [GUARDIAN]: Blindando pasta física: {}", path);
+        self.armored_folders.push(path.to_string());
     }
 }

@@ -1,0 +1,130 @@
+{
+    "nexus-universe": [],
+    "massa_critica": [],
+    "config": [
+        "registry.json"
+    ],
+    "quarantine": [
+        "relatorio_intencao_nexus.md",
+        "README.md",
+        "mass_lexer.py",
+        "nexus_engine.py",
+        "tester.py"
+    ],
+    "sandbox": [],
+    "logs": [],
+    "incoming": [
+        "nexus_snippets.py"
+    ],
+    "core-rust": [
+        "Cargo.toml",
+        "Cargo.lock"
+    ],
+    "tests": [
+        "rename_tests.rs",
+        "ghost_tests.rs",
+        "cascate_events.rs"
+    ],
+    "src": [
+        "main.rs",
+        "lib.rs",
+        "neural_link.rs",
+        "plugin_loader.rs"
+    ],
+    "psychology": [
+        "mod.rs"
+    ],
+    "archetypes": [
+        "weapon.rs",
+        "base.rs",
+        "mount.rs",
+        "npc.rs",
+        "pet.rs",
+        "mod.rs"
+    ],
+    "npc": [],
+    "weapon": [],
+    "pet": [],
+    "base": [],
+    "abyss": [
+        "military.rs",
+        "social.rs",
+        "economy.rs",
+        "sandbox.rs",
+        "mod.rs",
+        "fragmenter.rs"
+    ],
+    "utils": [],
+    "economy": [
+        "resources.rs",
+        "mod.rs"
+    ],
+    "military": [
+        "commands.rs",
+        "mod.rs",
+        "units.rs"
+    ],
+    "security": [
+        "mod.rs"
+    ],
+    "technology": [
+        "research.rs",
+        "mod.rs"
+    ],
+    "social": [
+        "mod.rs"
+    ],
+    "ai": [
+        "behavior.rs",
+        "npc.rs",
+        "mod.rs"
+    ],
+    "core": [],
+    "brain-py": [
+        "security_gate.py",
+        "nexus_management.py",
+        "connectivity_engine.py",
+        "quarantine_ghost.py",
+        "__init__.py",
+        "rank_manager.py",
+        "abyss_entropy.py",
+        "hot_reload.py",
+        "nexus_documenter.py",
+        "abyss_logic.py"
+    ],
+    "sistemas": [],
+    "data": [],
+    "gameplay": [],
+    "__pycache__": [
+        "nexus_management.cpython-312.pyc"
+    ],
+    "server-ts": [
+        "inventory.ini",
+        "Jenkinsfile",
+        "server.ts",
+        "README.md",
+        "docker-compose.yml",
+        "setup_config.yml",
+        "sonar-project.properties",
+        "package.json",
+        "grafana-datasource.yml",
+        "Dockerfile",
+        "prometheus-rules.yml",
+        "prometheus.yml",
+        "tsconfig.json"
+    ],
+    "terraform": [
+        "main.tf"
+    ],
+    "k8s": [
+        "deployment.yaml"
+    ],
+    "plugins": [],
+    "ranking": [
+        "function_ranking.json"
+    ],
+    "TIER_HIGH": [],
+    "TIER_MEDIUM": [],
+    "TIER_CRITICAL": [],
+    "TIER_LOW": []
+}

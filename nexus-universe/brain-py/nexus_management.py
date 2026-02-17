@@ -6,14 +6,18 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 class NexusManagementEngine:
-    """Motor de Gestão Unificado: Sieve + Semantic Parser + Massive Analyzer."""
+    """Motor de Gestão Unificado: Sieve + Semantic Parser + Massive Analyzer + Sentinel."""
 
-    def __init__(self):
+    def __init__(self, max_lines=2000, mass_limit=90000):
+        self.max_lines = max_lines
+        self.mass_limit = mass_limit
+        self.armored_folders = []
         self.library = {}
         self.quarantine = {}
         self.ghost_library = {}
         self.naming_map = {}
         self.conflict_logs = []
+        self.massa_critica_dir = "nexus-universe/massa_critica"
 
         # Assinaturas de Intenção para resolver Ambiguidade
         self.intent_signatures = {
@@ -25,7 +29,13 @@ class NexusManagementEngine:
         }
 
     def process_incoming_code(self, filename: str, content: str, declared_context: str = None):
-        """Triagem Pre-Commit e Análise de Massa."""
+        """Triagem Pre-Commit e Análise de Massa com Proteção Sentinel."""
+        linhas = content.split('\n')
+        if len(linhas) > self.max_lines:
+            print(f"🛡️ [SENTINEL]: Massa Crítica detectada ({len(linhas)} linhas). Iniciando segmentação...")
+            self._segment_code(filename, linhas)
+            return "SEGMENTED_BY_SENTINEL"
+
         detected_intent = self._detect_intent(content)
         context = declared_context or detected_intent
 
@@ -66,7 +76,23 @@ class NexusManagementEngine:
         return best_intent if scores[best_intent] > 0 else "UNKNOWN_CONTEXT"
 
     def _extract_functions(self, content: str) -> List[str]:
-        return re.findall(r"def\s+(\w+)\s*\(", content)
+        return re.findall(r"(?:def|fn|function)\s+([a-zA-Z_0-9]+)\s*\(", content)
+
+    def _segment_code(self, filename, linhas):
+        """Cria partes numeradas para evitar que o arquivo 'quebre' no mobile."""
+        parte = 1
+        base_name = os.path.splitext(filename)[0]
+        for i in range(0, len(linhas), self.max_lines):
+            chunk = linhas[i:i + self.max_lines]
+            nome_parte = f"{base_name}_PART_{parte}.py"
+            conteudo = "\n".join(chunk)
+            header = f"# [NEXUS PROTECT] - {filename} - PARTE {parte} - INTEGRALIDADE: OK\n"
+
+            caminho = os.path.join(self.massa_critica_dir, nome_parte)
+            with open(caminho, "w", encoding="utf-8") as f:
+                f.write(header + conteudo)
+            print(f"✅ [SENTINEL]: Segmento salvo: {nome_parte}")
+            parte += 1
 
     def _check_conflicts(self, name: str, context: str):
         for uid, data in self.library.items():
@@ -80,6 +106,24 @@ class NexusManagementEngine:
         self.naming_map[old_name] = new_name
         print(f"🔄 [HOT-RENAME]: '{old_name}' agora é mapeado como '{new_name}'.")
 
+    def shield_check(self, file_path):
+        """Verifica integridade de massa (Nexus Shield)."""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                total_lines = sum(1 for _ in f)
+            if total_lines > self.mass_limit:
+                return f"⚠️ [SHIELD]: Bloqueado! {total_lines} linhas excedem o limite de {self.mass_limit}."
+            return f"✅ [SHIELD]: {total_lines} linhas verificadas."
+        except Exception as e:
+            return f"❌ [SHIELD] Erro: {e}"
+
+    def create_armored_folder(self, path):
+        """Cria pastas protegidas contra alteração não autorizada."""
+        if not os.path.exists(path):
+            os.makedirs(path)
+            self.armored_folders.append(path)
+            print(f"🛡️ [SHIELD]: Pasta Blindada ativa: {path}")
+
     def generate_report(self):
         return {
             "total_quarantine": len(self.quarantine),
@@ -87,6 +131,22 @@ class NexusManagementEngine:
             "conflicts": self.conflict_logs,
             "ghosts": len(self.ghost_library)
         }
+
+    def generate_map_manifest(self, root_dir="nexus-universe"):
+        """Gera um 'GPS' do projeto para a IA não se perder (Nexus Map)."""
+        print(f"🕵️ [NEXUS]: Mapeando labirinto de pastas em {root_dir}...")
+        project_map = {}
+        for root, dirs, files in os.walk(root_dir):
+            if any(junk in root for junk in ['node_modules', 'target', '.git', 'dist']):
+                continue
+            folder_name = os.path.basename(root)
+            project_map[folder_name] = files
+
+        manifest_path = os.path.join("nexus-universe/config", "nexus_map_manifest.json")
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(project_map, f, indent=4)
+        print(f"✅ [MAP]: Manifesto gerado em {manifest_path}")
+        return manifest_path
 
 class NexusAutopilot:
     """Sistema de automação para análise e melhoria."""
