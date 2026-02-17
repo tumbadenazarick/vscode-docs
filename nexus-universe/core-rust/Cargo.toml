@@ -16,6 +16,7 @@ log = "0.4"
 env_logger = "0.10"
 dashmap = "5.4" # Para mapas concorrentes de alta performance
 anyhow = "1.0"
+md5 = "0.7"
 
 [lib]
 name = "operacao_fronteira_unificada"

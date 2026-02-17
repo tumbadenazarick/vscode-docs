@@ -10,6 +10,9 @@ pub mod prelude {
     pub use crate::utils::ghost_manager::*;
     pub use crate::psychology::*;
     pub use crate::social::*;
+    pub use crate::security::*;
+    pub use crate::neural_link::*;
+    pub use crate::plugin_loader::*;
 }
 
 pub mod core;
@@ -22,3 +25,6 @@ pub mod psychology;
 pub mod social;
 pub mod abyss;
 pub mod archetypes;
+pub mod security;
+pub mod neural_link;
+pub mod plugin_loader;
