@@ -1,4 +1,4 @@
-use crate::archetypes::Action;
+use crate::archetypes::{Action, SemanticSignature};
 
 pub struct Npc;
 
@@ -8,5 +8,8 @@ impl Action for Npc {
     }
     fn intent(&self) -> String {
         "Execução de Ordens e Controle de Área".to_string()
+    }
+    fn signature(&self) -> SemanticSignature {
+        SemanticSignature::Militar
     }
 }

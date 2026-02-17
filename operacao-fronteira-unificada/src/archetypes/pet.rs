@@ -1,4 +1,4 @@
-use crate::archetypes::Action;
+use crate::archetypes::{Action, SemanticSignature};
 
 pub struct Pet;
 
@@ -8,5 +8,8 @@ impl Action for Pet {
     }
     fn intent(&self) -> String {
         "Apoio Emocional e Combate Próximo".to_string()
+    }
+    fn signature(&self) -> SemanticSignature {
+        SemanticSignature::Suporte
     }
 }

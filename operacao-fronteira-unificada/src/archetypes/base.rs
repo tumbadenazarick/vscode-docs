@@ -1,4 +1,4 @@
-use crate::archetypes::Action;
+use crate::archetypes::{Action, SemanticSignature};
 
 pub struct Base;
 
@@ -8,5 +8,8 @@ impl Action for Base {
     }
     fn intent(&self) -> String {
         "Proteção de Recursos e Logística".to_string()
+    }
+    fn signature(&self) -> SemanticSignature {
+        SemanticSignature::Militar
     }
 }
