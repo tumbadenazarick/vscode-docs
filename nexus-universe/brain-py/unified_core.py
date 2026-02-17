@@ -1,181 +1,185 @@
-import re
 import random
+import re
+import json
+import zlib
+import pickle
+import os
+from datetime import datetime
+from typing import Dict, List, Optional, Any
+
+# ============================================================================
+# NÚCLEO DE SEGURANÇA E VALIDAÇÃO (NEXUS SENTINEL)
+# ============================================================================
 
 class SecurityGuardian:
-    """Valida códigos de confirmação e permissões de segurança."""
+    """Valida códigos de confirmação e integridade sistêmica."""
 
     @staticmethod
     def validate_command(command_code: str) -> bool:
         """Valida se o código segue o formato CMD-XXXXXX."""
         pattern = r"^CMD-\d{6}$"
         if re.match(pattern, command_code):
-            print(f"[SECURITY] Código {command_code} VALIDADO.")
+            print(f"✅ [SECURITY] Código {command_code} VALIDADO.")
             return True
-        print(f"[SECURITY] Código {command_code} REJEITADO. Formato inválido.")
+        print(f"❌ [SECURITY] Código {command_code} REJEITADO. Formato inválido.")
         return False
 
-class MilitaryBase:
-    """Gerencia patentes militares, ordens e comportamentos."""
-
-    RANKS = ["Soldado", "Comandante", "General", "GodMode"]
-
-    BEHAVIORS = {
-        "Soldado": ["Sim, senhor!", "Aguardando ordens.", "Patrulhando o setor.", "Recarregando!"],
-        "Comandante": ["Avançar posição!", "Solicito reforços!", "Código Vermelho detectado!", "Mantenham a formação!"],
-        "General": ["A vitória é nossa única opção.", "Execute o protocolo Aurora.", "Preparem o bombardeio orbital.", "Retirada não é uma opção."],
-    }
-
-    def __init__(self, name: str, rank: str = "Soldado"):
-        self.name = name
-        if rank not in self.RANKS:
-            rank = "Soldado"
-        self.rank = rank
-        self.efficiency_bonus = 1.0
-        print(f"[MILITARY] {self.name} inicializado com a patente {self.rank}.")
-
-    def execute_order(self, order: str, command_code: str):
-        """Executa uma ordem militar se o código de segurança for válido."""
-        print(f"[MILITARY] {self.name} ({self.rank}) recebeu a ordem: '{order}'")
-
-        if SecurityGuardian.validate_command(command_code):
-            phrase = random.choice(self.BEHAVIORS.get(self.rank, ["..."]))
-            print(f"[BEHAVIOR] {self.name}: '{phrase}'")
-            success_rate = min(1.0, 0.8 * self.efficiency_bonus)
-            action_success = random.random() <= success_rate
-
-            if action_success:
-                print(f"[ACTION] Ordem '{order}' EXECUTADA com sucesso (Taxa: {success_rate:.0%}).")
-            else:
-                print(f"[ACTION] Ordem '{order}' FALHOU por atrito operacional (Taxa: {success_rate:.0%}).")
-
-            return True, action_success
-        else:
-            print(f"[BEHAVIOR] {self.name}: 'Negativo! Sem código de confirmação válido, não posso agir.'")
-            return False, False
-
-class EconomySystem:
-    """Gerencia recursos econômicos, eficiência e entropia (corrupção)."""
-
-    def __init__(self, initial_resources: float = 1000.0):
-        self.resources = initial_resources
-        self.efficiency = 1.0  # 1.0 = 100%
-        self.entropy = 0.0     # 0.0 = Nenhuma corrupção
-        self.shield_active = False
-        print(f"[ECONOMY] Sistema iniciado com {self.resources} créditos.")
-
-    def update_cycle(self, production_base: float):
-        """Atualiza a economia com base na eficiência e entropia."""
-        actual_production = production_base * self.efficiency * (1 - self.entropy)
-        self.resources += actual_production
-        print(f"[ECONOMY] Ciclo finalizado. Produção: {actual_production:.2f}. Recursos atuais: {self.resources:.2f}")
-
-    def inject_entropy(self, amount: float):
-        """Simula a corrupção do Abyss injetando entropia."""
-        if self.shield_active:
-            amount *= 0.5 # Escudo reduz impacto
-            print("[ECONOMY] Escudo de Aurora mitigou parte da entropia!")
-        self.entropy = min(1.0, self.entropy + amount)
-        print(f"[ECONOMY] AVISO: Entropia injetada! Nível atual: {self.entropy:.2%}")
-
-class TechTree:
-    """Gerencia a progressão tecnológica e desbloqueios."""
-
-    def __init__(self):
-        self.unlocked_techs = set()
-        self.tech_data = {
-            "IA Militar": {"cost": 500, "benefit": "Aumento de 20% na eficiência de ordens"},
-            "Fusão Estelar": {"cost": 1200, "benefit": "Produção base de energia triplicada"},
-            "Escudo de Aurora": {"cost": 2000, "benefit": "Proteção total contra entropia leve"},
-            "Fragmentação de Abyss": {"cost": 1500, "benefit": "Injeção de 50% de entropia no inimigo"}
-        }
-
-    def research(self, tech_name: str, economy: EconomySystem, military: MilitaryBase = None):
-        """Realiza pesquisa se houver recursos suficientes e aplica benefícios."""
-        if tech_name in self.unlocked_techs:
-            print(f"[TECH] {tech_name} já foi pesquisada.")
-            return False
-
-        if tech_name not in self.tech_data:
-            print(f"[TECH] Tecnologia {tech_name} desconhecida.")
-            return False
-
-        cost = self.tech_data[tech_name]["cost"]
-        if economy.resources >= cost:
-            economy.resources -= cost
-            self.unlocked_techs.add(tech_name)
-
-            # Aplicação de efeitos
-            if tech_name == "IA Militar" and military:
-                military.efficiency_bonus += 0.2
-            elif tech_name == "Fusão Estelar":
-                economy.efficiency += 0.5
-            elif tech_name == "Escudo de Aurora":
-                economy.shield_active = True
-
-            print(f"[TECH] Pesquisa concluída: {tech_name}. Benefício: {self.tech_data[tech_name]['benefit']}")
-            return True
-        else:
-            print(f"[TECH] Recursos insuficientes para {tech_name}. Necessário: {cost}")
-            return False
+# ============================================================================
+# ENTIDADES E PSICOLOGIA (HIERARQUIA DE MASLOW)
+# ============================================================================
 
 class NPC:
-    """Representa um habitante ou soldado com necessidades e estados psicológicos."""
+    """Entidade com estados psicológicos e necessidades."""
 
-    def __init__(self, name: str, role: str):
-        self.name = name
+    def __init__(self, nome: str, role: str):
+        self.nome = nome
         self.role = role
-        self.stress_level = 0.0  # 0.0 a 1.0
-        self.maslow_tier = "Segurança"  # Fisiologia, Segurança, Social, Estima, Autorrealização
-        self.semantic_signature = f"SIG-{name.upper()}-{random.randint(1000, 9999)}"
+        self.stress_level = 0.0
+        self.moral = 100
+        self.saude = 100
+        self.maslow_tier = "Segurança" # Fisiologia -> Segurança -> Social -> Estima
+        self.semantic_signature = f"SIG-{nome.upper()}-{random.randint(1000, 9999)}"
 
-    def update_psychology(self, environment_entropy: float):
-        """Aplica a 'Lógica de Fricção' baseada na entropia do ambiente."""
-        self.stress_level = min(1.0, self.stress_level + (environment_entropy * 1.2))
+    def update_psychology(self, entropy: float):
+        """Aplica a 'Lógica de Fricção'."""
+        self.stress_level = min(1.0, self.stress_level + (entropy * 1.5))
+        self.moral = max(0, self.moral - (entropy * 20))
 
         if self.stress_level > 0.7:
-            print(f"[PSYCHOLOGY] {self.name} ({self.role}) está em colapso! Estresse: {self.stress_level:.2%}")
-            return "REBELIÃO"
+            print(f"⚠️ [PSYCHOLOGY] {self.nome} ({self.role}) em colapso moral!")
+            return "INSURREIÇÃO"
         return "NOMINAL"
 
-class NeuralLink:
-    """Sistema de comunicação broadcast e simulação de conflito Aurora vs Abyss."""
+# ============================================================================
+# SISTEMA ECONÔMICO E TECNOLÓGICO (AURORA ECONOMY)
+# ============================================================================
+
+class EconomySystem:
+    """Gerencia recursos, eficiência e mitigação de entropia."""
+
+    def __init__(self, initial_gold: float = 10000.0):
+        self.ouro = initial_gold
+        self.eficiencia = 1.0
+        self.entropia = 0.0
+        self.custo_manutencao = 0.0
+        print(f"💰 [ECONOMY] Sistema iniciado com {self.ouro} créditos.")
+
+    def processar_ciclo(self, base_production: float):
+        """Calcula rendimento: R = B * Eficiencia * (1 - Entropia) - Manutenção."""
+        rendimento = (base_production * self.eficiencia * (1 - self.entropia)) - self.custo_manutencao
+        self.ouro += rendimento
+        status = "ESTÁVEL" if self.ouro > 0 else "DÉBITO CRÍTICO"
+        print(f"📊 [ECONOMY] Ciclo: {rendimento:+.2f} | Saldo: {self.ouro:.2f} | Status: {status}")
+        return self.ouro > 0
+
+class TechTree:
+    """Árvore tecnológica e pesquisa."""
 
     def __init__(self):
-        self.log_eventos = []
-        self.entities = []
-        print("[NEURALLINK] Sistema de comunicação neural estabelecido.")
+        self.unlocked = set()
+        self.tech_data = {
+            "IA Militar": {"cost": 1500, "bonus": "Eficiência Bélica +20%"},
+            "Escudo Aurora": {"cost": 3000, "bonus": "Redução de Entropia em 50%"},
+            "Sintetizador de Ouro": {"cost": 5000, "bonus": "Produção Base +500"}
+        }
 
-    def broadcast(self, sender: str, message: str, type: str = "INFO"):
-        """Envia uma mensagem para todo o sistema."""
-        event = f"[{type}] {sender}: {message}"
-        self.log_eventos.append(event)
-        print(f"[BROADCAST] {event}")
+    def research(self, tech_name: str, economy: EconomySystem):
+        if tech_name in self.unlocked: return False
+        cost = self.tech_data.get(tech_name, {}).get("cost", 999999)
 
-    def simulate_conflict(self, economy: EconomySystem, military: MilitaryBase):
-        """Simula o impacto do conflito entre Ordem e Caos."""
-        chance = random.random()
-        if chance < 0.3:
-            self.broadcast("ABYSS", "Fragmentação detectada! Injetando entropia no sistema econômico.", "CRITICAL")
-            economy.inject_entropy(0.15)
-            # Impacto nos NPCs
-            for npc in self.entities:
-                if npc.update_psychology(0.15) == "REBELIÃO":
-                    self.broadcast("SECURITY", f"Insurreição detectada: {npc.name}", "WARNING")
-        elif chance > 0.7:
-            self.broadcast("AURORA", "Protocolo de Estabilização ativado. Eficiência aumentada.", "SUCCESS")
-            economy.efficiency += 0.05
-            economy.entropy = max(0, economy.entropy - 0.05)
-            for npc in self.entities:
-                npc.stress_level = max(0, npc.stress_level - 0.1)
-        else:
-            self.broadcast("NEUTRAL", "Estado sistêmico nominal.", "INFO")
+        if economy.ouro >= cost:
+            economy.ouro -= cost
+            self.unlocked.add(tech_name)
+            print(f"🚀 [TECH] Pesquisa concluída: {tech_name}!")
+            return True
+        print(f"❌ [TECH] Recursos insuficientes para {tech_name}.")
+        return False
+
+# ============================================================================
+# BASE MILITAR E COMANDO (OPERACAO FRONTEIRA)
+# ============================================================================
+
+class MilitaryBase:
+    """Gerencia patentes, ordens e força belica."""
+
+    RANKS = {"Soldado": 1, "Comandante": 2, "General": 3, "Imperador": 5}
+
+    BEHAVIORS = {
+        "Soldado": ["A postos!", "Patrulhando.", "Recarregando."],
+        "Comandante": ["Avançar!", "Solicito reforços!", "Manter posição!"],
+        "General": ["Estratégia Aurora ativa.", "Bombardeio orbital autorizado."],
+        "Imperador": ["O multiverso se curva à nossa vontade."]
+    }
+
+    def __init__(self, nome: str, rank: str = "Soldado"):
+        self.nome = nome
+        self.rank = rank if rank in self.RANKS else "Soldado"
+        self.efficiency_bonus = 1.0
+        self.tropas = []
+
+    def execute_order(self, order: str, command_code: str):
+        print(f"⚔️ [MILITARY] {self.nome} ({self.rank}) recebeu: '{order}'")
+
+        if SecurityGuardian.validate_command(command_code):
+            frase = random.choice(self.BEHAVIORS.get(self.rank, ["..."]))
+            print(f"🗣️ [BEHAVIOR] {self.nome}: '{frase}'")
+
+            # Cálculo de sucesso baseado em atrito
+            success_rate = min(1.0, 0.8 * self.efficiency_bonus)
+            success = random.random() <= success_rate
+
+            if success:
+                print(f"💥 [ACTION] Ordem executada com sucesso (Taxa: {success_rate:.0%}).")
+            else:
+                print(f"💨 [ACTION] Ordem falhou por atrito operacional.")
+            return True, success
+
+        print(f"🚫 [BEHAVIOR] {self.nome}: 'Sem código, sem ação.'")
+        return False, False
+
+# ============================================================================
+# SISTEMA UNIFICADO (GALAXIA AURORA FINAL)
+# ============================================================================
+
+class GalaxiaAurora:
+    """A síntese final de todos os sistemas."""
+
+    def __init__(self, protagonista="Caíque"):
+        self.protagonista = protagonista
+        self.economia = EconomySystem()
+        self.tecnologia = TechTree()
+        self.base = MilitaryBase("Fortaleza Nexus", "General")
+        self.npcs = [NPC("Kael", "Minerador"), NPC("Valkyrie", "Piloto")]
+        self.turno = 1
+
+    def rodar_turno(self, comando_militar, codigo):
+        print(f"\n{'='*20} TURNO {self.turno} {'='*20}")
+
+        # 1. Economia
+        self.economia.processar_ciclo(1200)
+
+        # 2. IA e Psicologia
+        entropia_atual = random.uniform(0, 0.2)
+        for npc in self.npcs:
+            if npc.update_psychology(entropia_atual) == "INSURREIÇÃO":
+                print(f"🚨 [AVISO] Crise interna com {npc.nome}!")
+                self.economia.eficiencia *= 0.9
+
+        # 3. Militar
+        self.base.execute_order(comando_militar, codigo)
+
+        self.turno += 1
+
+# ============================================================================
+# TESTE INTEGRADO
+# ============================================================================
 
 if __name__ == "__main__":
-    # Teste inicial da base militar
-    guardian = SecurityGuardian()
-    soldier = MilitaryBase("Valkyrie", "Soldado")
-    commander = MilitaryBase("Leonidas", "Comandante")
+    jogo = GalaxiaAurora()
+    jogo.rodar_turno("Reforçar fronteira do Abyss", "CMD-123456")
+    jogo.rodar_turno("Pesquisar IA Militar", "INVALIDO")
 
-    # Retorna uma tupla (seguranca_ok, acao_ok)
-    sec_ok, act_ok = soldier.execute_order("Atacar flanco norte", "CMD-123456")
-    commander.execute_order("Ativar Defesa Global", "INVALID-CODE")
+    # Teste de Pesquisa
+    jogo.tecnologia.research("IA Militar", jogo.economia)
+    jogo.base.efficiency_bonus = 1.2
+    jogo.rodar_turno("Ataque Final", "CMD-999000")

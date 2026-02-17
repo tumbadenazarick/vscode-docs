@@ -1,68 +1,56 @@
 import sys
 import os
 
-# Adiciona o diretório brain-py ao path para importar o unified_core
+# Adiciona o diretório brain-py ao path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'brain-py'))
 
-from unified_core import MilitaryBase, SecurityGuardian, EconomySystem, TechTree, NeuralLink, NPC
+from unified_core import GalaxiaAurora, SecurityGuardian, EconomySystem, MilitaryBase
 
-def run_tests():
-    print("=== INICIANDO TESTES DO NEXUS UNIVERSE ===\n")
+def run_nexus_tests():
+    print("🧪 [TEST] Iniciando Bateria de Testes Unificados...\n")
 
     # 1. Teste de Segurança
-    print("--- Teste 1: Segurança ---")
+    print("--- Teste 1: Segurança de Comando ---")
     assert SecurityGuardian.validate_command("CMD-123456") == True
-    assert SecurityGuardian.validate_command("ABC-123456") == False
-    print("OK\n")
+    assert SecurityGuardian.validate_command("ERRO-000000") == False
+    print("✅ OK\n")
 
-    # 2. Teste de Base Militar
-    print("--- Teste 2: Base Militar ---")
+    # 2. Teste de Economia
+    print("--- Teste 2: Sustentabilidade Econômica ---")
+    eco = EconomySystem(5000)
+    eco.custo_manutencao = 2000
+    # Produção de 1200 com custo de 2000 deve resultar em perda
+    # Saldo = 5000 + (1200 - 2000) = 4200
+    eco.processar_ciclo(1200)
+    assert eco.ouro == 4200
+    print("✅ OK\n")
+
+    # 3. Teste de Comportamento Militar
+    print("--- Teste 3: Comportamento e Atrito ---")
     general = MilitaryBase("Sun Tzu", "General")
-    # Ordem válida (segurança deve passar)
-    sec_ok, act_ok = general.execute_order("Bombardeio", "CMD-999888")
-    assert sec_ok == True
-    # Ordem inválida (sem código)
-    sec_ok, act_ok = general.execute_order("Bombardeio", "NO-CODE")
-    assert sec_ok == False
-    print("OK\n")
+    # Ordem com código válido
+    sec, act = general.execute_order("Ofensiva de Inverno", "CMD-999111")
+    assert sec == True
+    # Ordem com código inválido
+    sec, act = general.execute_order("Retirada", "INVALIDO")
+    assert sec == False
+    print("✅ OK\n")
 
-    # 3. Teste de Economia e Entropia
-    print("--- Teste 3: Economia ---")
-    econ = EconomySystem(1000)
-    econ.update_cycle(100)
-    assert econ.resources == 1100
-    econ.inject_entropy(0.5)
-    econ.update_cycle(100) # 100 * 1.0 * (1 - 0.5) = 50
-    assert econ.resources == 1150
-    print("OK\n")
+    # 4. Simulação de Turno Completo
+    print("--- Teste 4: Ciclo Vital do Jogo ---")
+    jogo = GalaxiaAurora("Caíque")
+    jogo.rodar_turno("Inspeção de Tropas", "CMD-000111")
+    assert jogo.turno == 2
+    print("✅ OK\n")
 
-    # 4. Teste de Tecnologia
-    print("--- Teste 4: Tecnologia ---")
-    tech = TechTree()
-    econ.resources = 600
-    assert tech.research("IA Militar", econ, general) == True
-    assert general.efficiency_bonus > 1.0
-    assert econ.resources == 100
-    assert tech.research("IA Militar", econ, general) == False # Já pesquisada
-    assert tech.research("Fusão Estelar", econ) == False # Sem fundos
-    print("OK\n")
-
-    # 5. Teste de NeuralLink, NPCs e Conflito
-    print("--- Teste 5: NeuralLink e NPCs ---")
-    link = NeuralLink()
-    npc = NPC("Kael", "Minerador")
-    link.entities.append(npc)
-
-    link.broadcast("SISTEMA", "Teste de broadcast")
-
-    # Simula conflito para testar impacto psicológico
-    econ.entropy = 0.6
-    link.simulate_conflict(econ, general) # Pode triggar ABYSS e estresse
-
-    print(f"Estado do NPC {npc.name}: Estresse={npc.stress_level:.2%}")
-    print("OK\n")
-
-    print("=== TODOS OS TESTES PASSARAM COM SUCESSO! ===")
+    print("🏁 [FINISH] Todos os sistemas Nexus estão nominais!")
 
 if __name__ == "__main__":
-    run_tests()
+    try:
+        run_nexus_tests()
+    except AssertionError as e:
+        print(f"❌ [FAIL] Teste falhou! Detalhes: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"💥 [CRASH] Erro inesperado: {e}")
+        sys.exit(1)
