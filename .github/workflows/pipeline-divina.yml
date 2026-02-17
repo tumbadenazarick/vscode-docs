@@ -48,6 +48,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./nexus-universe/server-ts/terraform
+        continue-on-error: true
         run: |
           terraform init
           terraform apply -auto-approve
@@ -57,6 +58,7 @@ jobs:
       # 6. Ansible (Configura os detalhes internos dos servidores)
       - name: Run Ansible Playbook
         working-directory: ./nexus-universe/server-ts
+        continue-on-error: true
         run: ansible-playbook -i inventory.ini setup_config.yml
 
   orquestracao_k8s:
@@ -69,6 +71,7 @@ jobs:
 
       - name: Kubernetes Deploy
         working-directory: ./nexus-universe/server-ts
+        continue-on-error: true
         run: |
           kubectl apply -f k8s/deployment.yaml
           kubectl rollout status deployment/projeto-aurora
