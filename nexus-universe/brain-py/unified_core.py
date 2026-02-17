@@ -118,11 +118,31 @@ class TechTree:
             print(f"[TECH] Recursos insuficientes para {tech_name}. Necessário: {cost}")
             return False
 
+class NPC:
+    """Representa um habitante ou soldado com necessidades e estados psicológicos."""
+
+    def __init__(self, name: str, role: str):
+        self.name = name
+        self.role = role
+        self.stress_level = 0.0  # 0.0 a 1.0
+        self.maslow_tier = "Segurança"  # Fisiologia, Segurança, Social, Estima, Autorrealização
+        self.semantic_signature = f"SIG-{name.upper()}-{random.randint(1000, 9999)}"
+
+    def update_psychology(self, environment_entropy: float):
+        """Aplica a 'Lógica de Fricção' baseada na entropia do ambiente."""
+        self.stress_level = min(1.0, self.stress_level + (environment_entropy * 1.2))
+
+        if self.stress_level > 0.7:
+            print(f"[PSYCHOLOGY] {self.name} ({self.role}) está em colapso! Estresse: {self.stress_level:.2%}")
+            return "REBELIÃO"
+        return "NOMINAL"
+
 class NeuralLink:
     """Sistema de comunicação broadcast e simulação de conflito Aurora vs Abyss."""
 
     def __init__(self):
         self.log_eventos = []
+        self.entities = []
         print("[NEURALLINK] Sistema de comunicação neural estabelecido.")
 
     def broadcast(self, sender: str, message: str, type: str = "INFO"):
@@ -137,10 +157,16 @@ class NeuralLink:
         if chance < 0.3:
             self.broadcast("ABYSS", "Fragmentação detectada! Injetando entropia no sistema econômico.", "CRITICAL")
             economy.inject_entropy(0.15)
+            # Impacto nos NPCs
+            for npc in self.entities:
+                if npc.update_psychology(0.15) == "REBELIÃO":
+                    self.broadcast("SECURITY", f"Insurreição detectada: {npc.name}", "WARNING")
         elif chance > 0.7:
             self.broadcast("AURORA", "Protocolo de Estabilização ativado. Eficiência aumentada.", "SUCCESS")
             economy.efficiency += 0.05
             economy.entropy = max(0, economy.entropy - 0.05)
+            for npc in self.entities:
+                npc.stress_level = max(0, npc.stress_level - 0.1)
         else:
             self.broadcast("NEUTRAL", "Estado sistêmico nominal.", "INFO")
 

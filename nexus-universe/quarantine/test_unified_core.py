@@ -4,7 +4,7 @@ import os
 # Adiciona o diretório brain-py ao path para importar o unified_core
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'brain-py'))
 
-from unified_core import MilitaryBase, SecurityGuardian, EconomySystem, TechTree, NeuralLink
+from unified_core import MilitaryBase, SecurityGuardian, EconomySystem, TechTree, NeuralLink, NPC
 
 def run_tests():
     print("=== INICIANDO TESTES DO NEXUS UNIVERSE ===\n")
@@ -47,13 +47,19 @@ def run_tests():
     assert tech.research("Fusão Estelar", econ) == False # Sem fundos
     print("OK\n")
 
-    # 5. Teste de NeuralLink e Conflito
-    print("--- Teste 5: NeuralLink ---")
+    # 5. Teste de NeuralLink, NPCs e Conflito
+    print("--- Teste 5: NeuralLink e NPCs ---")
     link = NeuralLink()
+    npc = NPC("Kael", "Minerador")
+    link.entities.append(npc)
+
     link.broadcast("SISTEMA", "Teste de broadcast")
-    # Simula conflito algumas vezes para garantir que roda sem erro
-    for _ in range(5):
-        link.simulate_conflict(econ, general)
+
+    # Simula conflito para testar impacto psicológico
+    econ.entropy = 0.6
+    link.simulate_conflict(econ, general) # Pode triggar ABYSS e estresse
+
+    print(f"Estado do NPC {npc.name}: Estresse={npc.stress_level:.2%}")
     print("OK\n")
 
     print("=== TODOS OS TESTES PASSARAM COM SUCESSO! ===")
