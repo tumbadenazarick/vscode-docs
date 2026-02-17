@@ -1,0 +1,30 @@
+{
+  "game_metadata": {
+    "name": "Galaxia Aurora",
+    "version": "3.0",
+    "mode": "AURORA"
+  },
+  "entities": {
+    "PROTAGONISTA_001": {
+      "display_name": "Caíque",
+      "internal_id": "caique_main"
+    },
+    "ALIADO_001": {
+      "display_name": "Basara",
+      "internal_id": "basara_rapper"
+    },
+    "HEROINA_001": {
+      "display_name": "Luna",
+      "internal_id": "luna_romance"
+    }
+  },
+  "paths": {
+    "save_folder": "saves/",
+    "logs_folder": "logs/",
+    "assets_folder": "assets/"
+  },
+  "economy_terms": {
+    "currency_name": "Ouro",
+    "tech_points_name": "Pontos de Pesquisa"
+  }
+}
