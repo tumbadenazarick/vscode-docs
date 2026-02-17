@@ -1,9 +1,9 @@
-target/
+**/target/
 **/*.rs.bk
-Cargo.lock
-node_modules/
-dist/
-*.log
-mass_code_report.json
-quarantine/logs/
-.DS_Store
+**/Cargo.lock
+**/node_modules/
+**/dist/
+**/*.log
+**/mass_code_report.json
+**/quarantine/logs/
+**/.DS_Store
