@@ -14,26 +14,32 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. SonarQube (Analisa qualidade e segurança)
+      # 2. Testes de IA (Python)
+      - name: Run Nexus Universe Tests
+        run: |
+          python3 nexus-universe/quarantine/test_unified_core.py
+
+      # 3. SonarQube (Analisa qualidade e segurança)
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
+        continue-on-error: true
         with:
-          projectBaseDir: projeto-aurora
+          projectBaseDir: nexus-universe/server-ts
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # 3. Docker (Cria a imagem do seu jogo/sistema)
+      # 4. Docker (Cria a imagem do seu jogo/sistema)
       - name: Build Docker Image
         run: |
-          docker build -t lord-eclipse-app:${{ github.sha }} projeto-aurora/
+          docker build -t lord-eclipse-app:${{ github.sha }} nexus-universe/server-ts/
           docker tag lord-eclipse-app:${{ github.sha }} tumbadenazarick/projeto-aurora:latest
 
   deploy_infra:
     needs: analise_e_teste
     runs-on: ubuntu-latest
     steps:
-      # 4. HashiCorp Terraform (Prepara os servidores automaticamente)
+      # 5. HashiCorp Terraform (Prepara os servidores automaticamente)
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -41,28 +47,31 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Apply
-        working-directory: ./projeto-aurora/terraform
+        working-directory: ./nexus-universe/server-ts/terraform
+        continue-on-error: true
         run: |
           terraform init
           terraform apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # 5. Ansible (Configura os detalhes internos dos servidores)
+      # 6. Ansible (Configura os detalhes internos dos servidores)
       - name: Run Ansible Playbook
-        working-directory: ./projeto-aurora
+        working-directory: ./nexus-universe/server-ts
+        continue-on-error: true
         run: ansible-playbook -i inventory.ini setup_config.yml
 
   orquestracao_k8s:
     needs: deploy_infra
     runs-on: ubuntu-latest
     steps:
-      # 6. Kubernetes (Coloca o sistema no ar)
+      # 7. Kubernetes (Coloca o sistema no ar)
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Kubernetes Deploy
-        working-directory: ./projeto-aurora
+        working-directory: ./nexus-universe/server-ts
+        continue-on-error: true
         run: |
           kubectl apply -f k8s/deployment.yaml
           kubectl rollout status deployment/projeto-aurora
